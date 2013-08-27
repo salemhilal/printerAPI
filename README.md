@@ -1,7 +1,9 @@
-printerApi
-==========
+CMU Printer API
+===============
 
-An API for checking the status of CMU's printers built on [Node][1], [Express][2], and [Cheerio][3].
+A server that exposes endpoints to check the status of Carnegie Mellon's printers. 
+Built on [Node][1], [Express][2], and [Cheerio][3].
+
 Scrapes data from CMU's [Printer Status][4] page.
 
 Install

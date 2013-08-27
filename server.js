@@ -2,15 +2,22 @@ var express = require('express')
   , app = express();
 
 var https = require('https')
-  , request = require('superagent')
   , cheerio = require('cheerio');
 
+// The cache currently only caches one page, but eventually there 
+// may be calls to other CMU resources.
 var url = "https://clusters.andrew.cmu.edu/printerstats/"
 var cache = {};
 var cache_ttl = 30*1000; // 30 seconds
 
+app.use(function(err, req, res, next){
+  console.error(err.stack);
+  res.send(500, 'Something broke! You should let Salem know.');
+});
+
 // Utility function that downloads a URL and invokes
-// callback with the data.
+// callback with the data. Caches the response with a ttl 
+// defined above. 
 function download(url, callback) {
   if(cache[url] 
         && cache[url].timestamp 
@@ -56,8 +63,17 @@ function toJson($, row) {
   t.trays       = $($(row).find("td")[4]).find("font").map(function(i,e){
     return $(e).html();
   });
+  t.ready = readyStatus(t.icon, t.status);
 
   return t;
+}
+
+// Determines if a printer is ready to print or not.
+//    @icon   - the icon displayed on the CMU website
+//    @status - the status string of the printer.
+function readyStatus(icon, status) {
+  return (icon.toLowerCase() === "go.gif")
+      || (status.toLowerCase().indexOf("ready to print") != -1);
 }
 
 function parse(data) {

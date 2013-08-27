@@ -1,11 +1,21 @@
 {
-  "name": "hello-world",
-  "description": "hello world test app",
-  "version": "0.0.1",
+  "name": "PrinterAPI",
+  "description": "Exposes the status/info of printers on CMU's campus.",
+  "version": "0.0.2",
+  "author": "Salem Hilal <salem@technoheads.org> (http://technoheads.org)",
   "private": true,
   "dependencies": {
-    "express": "3.x",
-    "superagent": "0.15.x",
-    "cheerio": "0.12.x"
+    "express": "latest",
+    "cheerio": "latest",
+  },
+  "devDependencies": {
+    "nodemon": "latest"
+  }, 
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bichiliad/printerAPI.git"
+  },
+  "scripts": {
+    "start": "nodemon server.js" 
   }
 }
