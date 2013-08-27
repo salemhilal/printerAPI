@@ -6,7 +6,7 @@
   "private": true,
   "dependencies": {
     "express": "latest",
-    "cheerio": "latest",
+    "cheerio": "latest"
   },
   "devDependencies": {
     "nodemon": "latest"
