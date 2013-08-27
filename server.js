@@ -8,7 +8,7 @@ var https = require('https')
 // may be calls to other CMU resources.
 var url = "https://clusters.andrew.cmu.edu/printerstats/"
 var cache = {};
-var cache_ttl = 30*1000; // 30 seconds
+var cache_ttl = 10*1000; // 30 seconds
 
 app.configure(function() {
     app.use(allowCrossDomain);
