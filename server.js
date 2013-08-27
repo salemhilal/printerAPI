@@ -72,15 +72,16 @@ function download(url, callback) {
 //    @row - the row to parse.
 function toJson($, row) {
   var t = {};
-  t.name        = $($(row).find("td")[0]).html();
-  t.icon        = $($(row).find("td")[1]).find("img").attr("src");
-  t.message     = $($(row).find("td")[2]).html();
-  t.status      = $($(row).find("td")[3]).html();
-  t.timestring  = $($(row).find("td")[5]).html();
+  t.name        = $($(row).find("td")[0]).text().trim();
+  t.icon        = $($(row).find("td")[1]).find("img").attr("src").trim();
+  t.message     = $($(row).find("td")[2]).text().trim();
+  t.status      = $($(row).find("td")[3]).text().trim();
+  t.timestring  = $($(row).find("td")[5]).html().replace("&nbsp;"," ").trim();
   t.trays       = $($(row).find("td")[4]).find("font").map(function(i,e){
-    return $(e).html();
+    return $(e).text();
   });
   t.ready = readyStatus(t.icon, t.status);
+  t.error = (!t.ready ? (t.status === "" ? t.message : t.status) : "");
 
   return t;
 }
@@ -109,8 +110,8 @@ function parse(data) {
   return null;
 }
 
-// Test
-app.get('/printers', function(req, res){
+// Printer endpoint.
+app.get('/printers', function(req, res) {
 
   download(url, function(data){
     var response = parse(data);
@@ -119,7 +120,11 @@ app.get('/printers', function(req, res){
     else
       res.send(500, "The request failed. You should probably let Salem know.");
   });
+});
 
+// Health check
+app.get('/ping', function(req, res) {
+  res.send("pong");
 });
 
 
