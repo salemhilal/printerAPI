@@ -32,6 +32,10 @@ function handleErrors(err, req, res, next){
   res.send(500, 'Something broke! You should let Salem know.');
 }
 
+function calculateTTL(timestamp) {
+  return cache_ttl - (Date.now() - timestamp);
+}
+
 // Utility function that downloads a URL and invokes
 // callback with the data. Caches the response with a ttl 
 // defined above. 
@@ -40,7 +44,8 @@ function download(url, callback) {
         && cache[url].timestamp 
         && (Date.now() - cache[url].timestamp) <= cache_ttl) {
     console.log("Cache hit");
-    callback(cache[url].body);
+
+    callback(cache[url].body, calculateTTL(cache[url].timestamp));
   }
 
   else {
@@ -57,11 +62,11 @@ function download(url, callback) {
           timestamp : Date.now(),
           body : data
         }
-        callback(data);
+        callback(data, calculateTTL(Date.now()));
 
       });
     }).on("error", function() {
-      callback(null);
+      callback(null, -1);
     });
   }
 
@@ -106,19 +111,27 @@ function parse(data) {
     });
     return t;
   }
-  else console.log("error");  
+  else console.log("Error parsing data: data was undefined.");  
   return null;
 }
 
 // Printer endpoint.
 app.get('/printers', function(req, res) {
 
-  download(url, function(data){
-    var response = parse(data);
-    if(response) 
+  download(url, function(data, ttl){
+    var response = {};
+    var printers =  parse(data);
+
+    // If we got data, add it and the cache ttl to the payload
+    if(printers) {
+      response.printers = printers
+      response.ttl = ttl;
       res.send(response);
-    else
-      res.send(500, "The request failed. You should probably let Salem know.");
+    }
+    // We have problems, and we best let people know it.
+    else {
+      res.send(500, {error: "The request failed. You should probably let Salem know."});
+    }
   });
 });
 
@@ -127,6 +140,6 @@ app.get('/ping', function(req, res) {
   res.send("pong");
 });
 
-
+// Start 'er up.
 app.listen(3000);
 console.log('Listening on port 3000');
